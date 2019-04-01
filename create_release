@@ -1,0 +1,22 @@
+#!/bin/sh
+
+CURRENT_REV=$(git rev-parse HEAD)
+
+git remote add original https://github.com/nlohmann/json
+git fetch original --tags
+git checkout $1
+git reset $CURRENT_REV
+git checkout master -- create_release
+
+rm -rf benchmarks
+rm -rf test
+rm -rf .github
+rm -rf .travis.yml
+rm -rf .gitignore
+
+git add *
+git commit -am "New release: $1"
+git branch -D $1
+git checkout -b $1
+git tag | xargs git tag -d
+git remote remove original
